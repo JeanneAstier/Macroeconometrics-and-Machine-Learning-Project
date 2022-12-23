@@ -14,9 +14,9 @@ source("functions/functions.R")
 
 #####
 ## The file with the forecasts will be saved with model_name
-model_name = "CSR"
+model_name = "RF"
 ## The function called to run models is model_function, which is a function from functions.R
-model_function = runcsr
+model_function = runrf
 #####
 
 
