@@ -15,8 +15,9 @@ rownames(data) = as.character(dates)
 
 
 # out-of-sample window to compare performances of models
-# subsample period : Jan2001 to Dec2015 (180 obs)
-nwindows = 180
+
+# subsample period : Jan1990 to Dec2015 (312 obs)
+nwindows = 312
 
 
 # 1. out of sample true inflation (y)
@@ -40,7 +41,7 @@ for(i in 1:12){
   rw[,i]=aux;
 }
 
-# forecast at date t for accumulated h-month inflation(t+1:t+h) is inflation(t???(h???1):t)
+# forecast at date t for accumulated h-month inflation(t+1:t+h) is inflation(t-(h-1):t)
 rw3 = tail(embed(y[,2],4)[,4],nwindows)
 rw6 = tail(embed(y[,3],7)[,7],nwindows)
 rw12 = tail(embed(y[,4],13)[,13],nwindows)
