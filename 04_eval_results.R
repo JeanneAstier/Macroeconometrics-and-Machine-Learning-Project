@@ -1,7 +1,12 @@
 library(tidyverse)
 library("writexl")
 library(MCS) # model confidence sets procedure
-library(mlRFinance) # must be installed from https://github.com/PedroBSB/mlRFinance
+library(mlRFinance) # must be installed from github.com/PedroBSB/mlRFinance
+library(modelconf) # must be installed from github.com/nielsaka/modelconf
+
+
+# set working directory
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 load("forecasts/yout.rda")
 load("forecasts/rw.rda")
@@ -10,6 +15,7 @@ load("forecasts/rw.rda")
 model_files = setdiff(list.files("forecasts/"),c("rw.rda","yout.rda"))
 
 models_list = list()
+
 for(i in 1:length(model_files)){
   
   load(paste("forecasts/",model_files[i],sep = ""))
@@ -143,7 +149,9 @@ res_mae_df$is_min <- names(res_mae_df)[apply(res_mae_df, MARGIN = 1, FUN = which
 write_xlsx(res_mae_df,"MAE.xlsx")
 
 
-### SPA TEST WITH RMSE ###
+
+
+### MCS TEST WITH RMSE ###
 
 # RMSE of random walk predictions
 rwe = sqrt(colMeans((rw[,1:12]-yout[,1])^2))
@@ -168,17 +176,36 @@ resrw = rbind(cbind(rwe), cbind(rweacc))
 res = cbind(res, resrw)
 res_df = data.frame(res)
 
-# SPA of random walk predictions
-spa_rw = hansen.spa(data.matrix(res_df[1:12,1:(ncol(res_df)-1)], rownames.force = NA), data.matrix(res_df[1:12,ncol(res_df)], rownames.force = NA),typeFunc=1,B=1000,geomMean=10,bandwidth=0.5, alpha=0.05, k=1, gamma=0.1)[2]
-
-# SPA of other model predictions
-SPA = lapply(model_files, function(x){hansen.spa(data.matrix(res_df[1:12,1:(ncol(res_df)-1)], rownames.force = NA),data.matrix(res_df[1:12,ncol(res_df)], rownames.force = NA),typeFunc=1,B=1000,geomMean=4,bandwidth=0.5, alpha=0.05, k=1, gamma=0.1)}[2])%>% Reduce(f=cbind)
+# MCS test
+estMCS(res_df[1:15,], test = "t.max", B = 25000, l = 12)
 
 
-# final table with p-values of all models
-res_SPA = cbind(spa_rw, SPA)
-res_SPA_df = data.frame(res_SPA)
-colnames(res_SPA_df) = c("RW", model_files)
+### MCS TEST WITH MAE ###
 
-# export
-write_xlsx(res_SPA_df,"SPA_sq.xlsx")
+# MEA of random walk predictions
+rwe = (colMeans(abs(rw[,1:12]-yout[,1])))
+
+# MEA of other model predictions
+errors = lapply(models_list, function(x){
+  (colMeans(abs(x[,1:12]-yout[,1])))
+})%>% Reduce(f=cbind)
+colnames(errors) = model_files
+
+# MAE of accumulated predictions
+rweacc = (colMeans(abs(rw[,13:15]-yout[,2:4])))
+errorsacc = lapply(models_list, function(x){
+  (colMeans(abs(x[,13:15]-yout[,2:4]),na.rm=TRUE))
+})%>% Reduce(f=cbind)
+colnames(errorsacc) = model_files
+
+
+# final table with MAE of all models
+res = rbind(errors, errorsacc)
+resrw = rbind(cbind(rwe), cbind(rweacc))
+res = cbind(res, resrw)
+res_df = data.frame(res)
+
+# MCS test
+estMCS(res_df[1:15,], test = "t.max", B = 25000, l = 12)
+
+
