@@ -15,7 +15,7 @@ rownames(data) = as.character(dates)
 
 # out-of-sample window to compare performances of models
 
-# subsample period : Jan2000 to Dec2015 (180 obs)
+# subsample period : Jan2005 to Dec2020 (180 obs)
 nwindows = 180
 
 
