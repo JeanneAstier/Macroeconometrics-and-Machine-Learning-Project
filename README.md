@@ -1,7 +1,7 @@
 # Macroeconometrics and Machine Learning Project
 Louis Blanco & Jeanne Astier
 
-This repository contains out Macroeconometric and Machine Learning Project. The aim of the project is the replicate and extend an article. This repository contains the following resources:
+This repository contains our Macroeconometric and Machine Learning Project. The aim of the project is the replicate and extend an article. This repository contains the following resources:
 
 - Paper to replicate -> Forecasting Inflation in a Data Rich Environment The Benefits of Machine Learning Methods.pdf
 - Supplemental materials from the authors -> supplementary material.pdf
